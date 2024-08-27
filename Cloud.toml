@@ -1,0 +1,4 @@
+[container.image]
+repository="assignment_1_e18285"
+name="server"
+tag="v0.1.0"
