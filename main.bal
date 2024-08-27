@@ -40,6 +40,29 @@ service / on new http:Listener(8080) {
         }
     }
 
+    // Get Book by ID
+    isolated resource function get getBookById(http:Caller caller, string id) returns error? {
+        if id is "" {
+            http:Response response = new;
+            response.statusCode = 400;
+            response.setJsonPayload({message: "No ID found"});
+            check caller->respond(response);
+        }
+        lock {
+            foreach var book in bookStore {
+                if book.id == id {
+                    check caller->respond(book.toJson());
+                    return;
+                }
+            }
+        }
+        // If no book is found with the given ID
+        http:Response response = new;
+        response.statusCode = 400;
+        response.setJsonPayload({message: "Book not found"});
+        check caller->respond(response);
+    }
+
     // GET method to retrieve all books
     isolated resource function get getAllBooks(http:Caller caller, http:Request req) returns error? {
         json bookList;
